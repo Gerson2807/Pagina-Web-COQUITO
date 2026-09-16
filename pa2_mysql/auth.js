@@ -1,0 +1,18 @@
+// auth.js — Hash y verificación de contraseñas (Inversiones Coquito)
+// Idéntico a la versión PostgreSQL: no depende del motor de base de datos.
+
+const crypto = require("crypto");
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+function verifyPassword(password, stored) {
+  const [salt, hash] = stored.split(":");
+  const check = crypto.scryptSync(password, salt, 64).toString("hex");
+  return crypto.timingSafeEqual(Buffer.from(hash, "hex"), Buffer.from(check, "hex"));
+}
+
+module.exports = { hashPassword, verifyPassword };
